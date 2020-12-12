@@ -2,6 +2,10 @@
   "name": "advent-of-code-2020-ts",
   "version": "1.0.0",
   "main": "index.js",
+  "scripts": {
+    "1": "node dist/aoc1.js",
+    "2": "node dist/aoc2.js"
+  },
   "license": "MIT",
   "devDependencies": {
     "typescript": "^4.1.2"

@@ -7,7 +7,8 @@
     "2": "node dist/aoc2.js",
     "3": "node dist/aoc3.js",
     "4": "node dist/aoc4.js",
-    "5": "node dist/aoc5.js"
+    "5": "node dist/aoc5.js",
+    "6": "node dist/aoc6.js"
   },
   "license": "MIT",
   "devDependencies": {

@@ -31,14 +31,29 @@ function total_occupied_seats(seats: any[]) {
 
 function part1() {
   let seats = parsedInput();
-  let orig = parsedInput();
   let changed = true;
 
   while(changed) {
     //log(seats);
     //console.log();
 
-    let output = iterate(seats);
+    let output = iterate(seats, 4, 1);
+    seats = output[0] as any[];
+    changed = output[1] as boolean;
+  }
+
+  return total_occupied_seats(seats);
+}
+
+function part2() {
+  let seats = parsedInput();
+  let changed = true;
+
+  while(changed) {
+    //log(seats);
+    //console.log();
+
+    let output = iterate(seats, 5, Infinity);
     seats = output[0] as any[];
     changed = output[1] as boolean;
   }
@@ -52,32 +67,60 @@ function log(seats: any[]) {
   }))
 }
 
-function iterate(input: any[]) {
+function seat_occupied_in_direction(seats: any[],
+                                    row:number,
+                                    col:number,
+                                    rowdir:number,
+                                    coldir:number,
+                                    max_move:number) {
+
+  for (let i = 1 ; i <= max_move ; i++) {
+    if (seats[row + (rowdir * i)] === undefined) {
+      return false;
+    }
+
+    if (seats[row + (rowdir * i)][col + (coldir * i)] === undefined) {
+      return false;
+    }
+
+    if (seats[row + (rowdir * i)][col + (coldir * i)] === 'L') {
+      return false;
+    }
+
+    if (seats[row + (rowdir * i)][col + (coldir * i)] === '#') {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function iterate(input: any[], tolerance: number, max_move: number) {
   let changed = false;
   const output = input.map((line, rowidx) => {
     return line.map((seat: string, colidx: number) => {
-      const up = (input[rowidx - 1] && input[rowidx - 1][colidx]);
-      const upleft = (input[rowidx - 1] && input[rowidx - 1][colidx - 1]);
-      const upright = (input[rowidx - 1] && input[rowidx - 1][colidx + 1]);
+      const up = seat_occupied_in_direction(input, rowidx, colidx, -1, 0, max_move);
+      const upleft = seat_occupied_in_direction(input, rowidx, colidx, -1, -1, max_move);
+      const upright = seat_occupied_in_direction(input, rowidx, colidx, -1, 1, max_move);
 
-      const down = (input[rowidx + 1] && input[rowidx + 1][colidx]);
-      const downleft = (input[rowidx + 1] && input[rowidx + 1][colidx - 1]);
-      const downright = (input[rowidx + 1] && input[rowidx + 1][colidx + 1]);
+      const down = seat_occupied_in_direction(input, rowidx, colidx, 1, 0, max_move);
+      const downleft = seat_occupied_in_direction(input, rowidx, colidx, 1, -1, max_move);
+      const downright = seat_occupied_in_direction(input, rowidx, colidx, 1, 1, max_move);
 
-      const left = input[rowidx][colidx - 1];
-      const right = input[rowidx][colidx + 1];
+      const left = seat_occupied_in_direction(input, rowidx, colidx, 0, -1, max_move);
+      const right = seat_occupied_in_direction(input, rowidx, colidx, 0, 1, max_move);
 
-      const candidate_set = [up, upleft, upright, down, downleft, downright, left, right]
+      const visible_occupied_seats = [up, upleft, upright, down, downleft, downright, left, right]
 
       if (seat === 'L') {
-        if (occupied_count(candidate_set) === 0) {
+        if (visible_occupied_seats.filter((seat) => seat).length === 0) {
           changed = true;
           return '#';
         } else {
           return 'L';
         }
       } else if (seat === '#') {
-        if (occupied_count(candidate_set) >= 4) {
+        if (visible_occupied_seats.filter((seat) => seat).length >= tolerance) {
           changed = true;
           return 'L'
         } else {
@@ -93,3 +136,4 @@ function iterate(input: any[]) {
 }
 
 console.log(part1());
+console.log(part2());

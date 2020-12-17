@@ -1,6 +1,6 @@
 import fs from 'fs';
 
-type position = [number, number, string];
+type part1position = [number, number, string];
 
 function parsedInput() {
   const input: string = fs.readFileSync('./res/aoc12.txt', 'utf8');
@@ -16,8 +16,8 @@ return input.split("\n").slice(0, -1);
 
 function part1() {
   const directions = parsedInput();
-  const finalpos:position = directions.reduce((acc, cmd) => {
-    const newpos = move(acc as position, cmd)
+  const finalpos:part1position = directions.reduce((acc, cmd) => {
+    const newpos = part1move(acc as part1position, cmd)
     //console.log(cmd);
     //console.log(newpos)
     //console.log();
@@ -27,7 +27,76 @@ function part1() {
   return Math.abs(finalpos[0]) + Math.abs(finalpos[1]);
 }
 
-function move(pos: position, cmd: string): position {
+function part2() {
+  const directions = parsedInput();
+  const finalpos = directions.reduce((acc, cmd) => {
+    const newpos = part2move(acc, cmd)
+    //console.log(cmd);
+    //console.log(newpos)
+    //console.log();
+    return newpos
+  }, [0,0,1,10])
+
+  return Math.abs(finalpos[0]) + Math.abs(finalpos[1]);
+}
+
+function part2move(pos: number[], cmd: string) {
+  const c = cmd[0];
+  const magnitude = parseInt(cmd.slice(1));
+
+  let shipvert = pos[0];
+  let shiphoriz = pos[1];
+  let vert = pos[2];
+  let horiz = pos[3];
+
+  switch (c) {
+    case ('N'):
+      return [pos[0], pos[1], pos[2] + magnitude, pos[3]];
+      break;
+    case ('S'):
+      return [pos[0], pos[1], pos[2] - magnitude, pos[3]];
+      break;
+    case ('E'):
+      return [pos[0], pos[1], pos[2], pos[3] + magnitude];
+      break;
+    case ('W'):
+      return [pos[0], pos[1], pos[2], pos[3] - magnitude];
+      break;
+
+    case ('L'):
+      for (let i = 0 ; i < magnitude / 90 ; i++) {
+        let orighoriz = horiz;
+        horiz = (vert * -1)
+        vert = orighoriz
+      }
+
+      return [pos[0], pos[1], vert, horiz];
+      break;
+
+    case ('R'):
+      for (let i = 0 ; i < magnitude / 90 ; i++) {
+        let origvert = vert;
+        vert = (horiz * -1)
+        horiz = origvert
+      }
+
+      return [pos[0], pos[1], vert, horiz];
+      break;
+
+    case ('F'):
+      for (let i = 0 ; i < magnitude ; i++) {
+        shipvert += vert;
+        shiphoriz += horiz;
+      }
+      return [shipvert, shiphoriz, vert, horiz];
+      break;
+  }
+
+
+  return pos;
+}
+
+function part1move(pos: part1position, cmd: string): part1position {
   const c = cmd[0];
   const magnitude = parseInt(cmd.slice(1));
   let dir = pos[2];
@@ -116,3 +185,4 @@ function move(pos: position, cmd: string): position {
 }
 
 console.log(part1());
+console.log(part2());

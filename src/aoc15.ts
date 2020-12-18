@@ -10,7 +10,7 @@ function parsedInput() {
   return input.split(',').map((n) => parseInt(n, 10));
 }
 
-function part1() {
+function play(iterations: number) {
   let turn = 0;
   let lastnum = 0;
   let map = new Map<number, number[]>();
@@ -24,8 +24,7 @@ function part1() {
 
   turn++;
 
-  //for( ; turn <= 2020; turn++) {
-  for( ; turn <= 2020; turn++) {
+  for( ; turn <= iterations; turn++) {
     if (map.has(lastnum)) {
       let turns = map.get(lastnum)
 
@@ -40,7 +39,7 @@ function part1() {
 
     if (map.has(lastnum)) {
       let curturns = map.get(lastnum)
-      map.set(lastnum, [turn, curturns[0]);
+      map.set(lastnum, [turn, curturns[0]]);
     } else {
       map.set(lastnum, [turn]);
     }
@@ -51,4 +50,13 @@ function part1() {
   return lastnum
 }
 
+function part1() {
+  return play(2020);
+}
+
+function part2() {
+  return play(30000000);
+}
+
 console.log(part1());
+console.log(part2());

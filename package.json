@@ -16,7 +16,8 @@
     "11": "node dist/aoc11.js",
     "12": "node dist/aoc12.js",
     "13": "node dist/aoc13.js",
-    "14": "node dist/aoc14.js"
+    "14": "node dist/aoc14.js",
+    "15": "node dist/aoc15.js"
   },
   "license": "MIT",
   "devDependencies": {

@@ -1,9 +1,11 @@
 import fs from 'fs';
 
+let nudge_set = [];
+
 const cartesian =
   (...a) => a.reduce((a, b) => a.flatMap(d => b.map(e => [d, e].flat())));
 
-function parsedInput() {
+function parsedInput(extraDimensions: number) {
   const input: string = fs.readFileSync('./res/aoc17.txt', 'utf8');
   // const input = `.#.
 // ..#
@@ -13,9 +15,21 @@ function parsedInput() {
 
   input.split("\n").slice(0,-1).forEach((row, y) => {
     row.split('').forEach((item, x) => {
-      if (item === '#') output.add([x,y,0]);
+      const point = [x,y]
+      for (let i = 0 ; i < extraDimensions ; i++) {
+        point.push(0)
+      }
+      if (item === '#') output.add(point);
     })
   });
+
+  let directions = []
+  for (let i = 0 ; i < 2 + extraDimensions ; i++) {
+    directions.push([0, -1, 1]);
+  }
+
+  nudge_set = cartesian(...directions)
+  nudge_set.shift()
 
   return output;
 }
@@ -73,15 +87,9 @@ function iterate(input: Set<number[]>) {
 }
 
 function neighbor_set(point: number[]): Set<number[]> {
-  const nudge_set = cartesian([0,-1,1],[0,-1,1],[0,-1,1])
-  nudge_set.shift()
 
   return nudge_set.reduce((acc, cur) => {
-    const newpoint = [
-      point[0] + cur[0],
-      point[1] + cur[1],
-      point[2] + cur[2]
-    ]
+    const newpoint = point.map((p, idx) => p + cur[idx])
 
     acc.add(newpoint)
     return acc;
@@ -96,7 +104,17 @@ function count_set(input: Set<number[]>) {
 }
 
 function part1() {
-  let actives = parsedInput();
+  let actives = parsedInput(1);
+  for (let i = 0 ; i < 6 ; i++) {
+    actives = iterate(actives);
+    //console.log(count_set(actives))
+  }
+
+  return count_set(actives)
+}
+
+function part2() {
+  let actives = parsedInput(2);
   for (let i = 0 ; i < 6 ; i++) {
     actives = iterate(actives);
     //console.log(count_set(actives))
@@ -106,3 +124,5 @@ function part1() {
 }
 
 console.log(part1())
+console.log(part2())
+

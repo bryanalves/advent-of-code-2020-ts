@@ -86,4 +86,17 @@ function part1() {
   }).length;
 }
 
+function part2() {
+  const input = parsedInput();
+  const ruleset = input[0]
+  const tests = input[1]
+  ruleset.set('8', [ ['42'], ['42', '8'])
+  ruleset.set('11', [ ['42', '31'], ['42', '11', '31'])
+
+  return (tests as string[]).filter((str:string) => {
+    return test(str, ruleset, ['0'])
+  }).length;
+}
+
 console.log(part1());
+console.log(part2());

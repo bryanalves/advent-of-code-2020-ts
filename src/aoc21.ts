@@ -18,37 +18,67 @@ function parsedInput() {
   });
 }
 
-function part1() {
-  const input = parsedInput();
-  const ingredients = new Set<string>(
-    input.reduce((acc, cur) => acc.concat(cur[0]), []));
-
-  const allergens = new Set<string>(
-    input.reduce((acc, cur) => acc.concat(cur[1]), []));
-
-  const allergen_possibles = new Map<string, Set<string>>()
+function allergen_possibles(input: string[][][]) {
+  const retval = new Map<string, Set<string>>()
   input.forEach((row) => {
     const ingredients = row[0]
     const allergens = row[1]
     allergens.forEach((a) => {
-      const match = allergen_possibles.has(a)
+      const match = retval.has(a)
       if (match) {
-        const cur = allergen_possibles.get(a)
+        const cur = retval.get(a)
         const next = Array.from(cur.values()).filter((ing) => {
           return ingredients.includes(ing)
         })
 
-        allergen_possibles.set(a, new Set<string>(next))
+        retval.set(a, new Set<string>(next))
 
       } else {
-        allergen_possibles.set(a, new Set<string>(row[0]))
+        retval.set(a, new Set<string>(row[0]))
       }
     })
   })
 
-  const safe = Array.from(ingredients.values()).filter((ingredient) => {
-    return !Array.from(allergen_possibles.values()).some((aposs) => aposs.has(ingredient))
+  return retval
+}
+
+function safe_ingredients(ingredients: string[], allergymap: Map<string, Set<string>>) {
+  return ingredients.filter((ingredient) => {
+    return !Array.from(allergymap.values()).some((aposs) => aposs.has(ingredient))
   });
+}
+
+function solve_allergy_map(allergymap: Map<string, Set<string>>) {
+  const allergykeys = Array.from(allergymap.keys())
+
+  let keep_iterating = true;
+  while (keep_iterating) {
+    keep_iterating = false;
+    allergykeys.forEach((allergen) => {
+      const candidates = allergymap.get(allergen)!
+
+      if (candidates.size === 1) {
+        const item_to_remove = Array.from(candidates.values())[0]
+
+        allergykeys.forEach((allergen2) => {
+          if (allergen == allergen2) return
+          allergymap.get(allergen2)!.delete(item_to_remove);
+        });
+      } else {
+        keep_iterating = true
+      }
+    });
+  }
+}
+
+function part1() {
+  const input = parsedInput();
+  const possibles = allergen_possibles(input)
+
+  const ingredients = new Set<string>(
+    input.reduce((acc, cur) => acc.concat(cur[0]), []));
+
+  const safe = safe_ingredients(Array.from(ingredients.values()), possibles)
 
   const safecount = safe.reduce((acc, ing) => {
     return acc + input.reduce((acc, cur) => {
@@ -60,4 +90,41 @@ function part1() {
   return safecount
 }
 
+function part2() {
+  const input = parsedInput();
+  const allergymap = allergen_possibles(input)
+
+  const ingredients = new Set<string>(
+    input.reduce((acc, cur) => acc.concat(cur[0]), []));
+
+  const safe = safe_ingredients(Array.from(ingredients.values()), allergymap)
+
+  safe.forEach((ingredient) => {
+    Array.from(allergymap.keys()).forEach((allergen) => {
+      const possibles = allergymap.get(allergen)
+      allergymap.set(allergen,
+        new Set<string>(
+          Array.from(possibles.values())
+            .filter(possible => possible != ingredient)
+        )
+      )
+    })
+  })
+
+  solve_allergy_map(allergymap)
+  const sorted = Array.from(allergymap.entries()).sort((entry, entry2) => {
+    if (entry[0] > entry2[0]) {
+      return 1;
+    }
+
+    if (entry[0] < entry2[0]) {
+      return -1;
+    }
+
+    return 0;
+  })
+  return sorted.map((ingset) => Array.from(ingset[1])[0]).join(',')
+}
+
 console.log(part1());
+console.log(part2());

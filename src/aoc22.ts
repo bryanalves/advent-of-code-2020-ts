@@ -137,5 +137,5 @@ function part2() {
   return recursive(player1, player2)[1]
 }
 
-//console.log(part1());
+console.log(part1());
 console.log(part2());

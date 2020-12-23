@@ -1,47 +1,74 @@
 function parsedInput() {
-  // const input = '389125467'
+  //const input = '389125467'
   const input = '496138527'
 
   return input.split('').map((i) => parseInt(i, 10))
 }
 
+function play(num_cups: number, iterations: number) {
+  const input = parsedInput()
+  const input_length = input.length
 
-function iterate(input: number[]) {
-  let target = input[0]
-
-  const pickedup = input.splice(1, 3)
-
-  let found = false
-  while(!found) {
-    target--
-    if (target == 0) target = 9
-    if (input.includes(target)) found = true
+  let cups = []
+  for (let i = 0 ; i <= num_cups ; i++) {
+    cups.push(0)
   }
 
-  const destIdx = input.indexOf(target)
+  let cur:number = input.shift()!
+  let first:number = cur
 
-  input.splice(destIdx + 1, 0, ...pickedup)
+  while (input.length > 0) {
+    cups[cur] = input.shift()!
+    cur = cups[cur]
+  }
 
-  input.push(input.shift()!)
+  for (let i = input_length + 1 ; i <= num_cups ; i++) {
+    cups[cur] = i
+    cur = i
+  }
 
-  return input
+  cups[cur] = first
+  cur = first
+
+  for (let i = 0 ; i < iterations ; i++) {
+    const removed_a:number = cups[cur]
+    const removed_b:number = cups[removed_a]
+    const removed_c:number = cups[removed_b]
+
+    let dest =  (cur > 1) ? cur - 1 : num_cups
+    while ([removed_a,removed_b,removed_c].includes(dest))
+      dest = (dest > 1) ? dest - 1 : num_cups
+
+    cups[cur] = cups[removed_c]
+    cups[removed_c] = cups[dest]
+    cups[dest] = removed_a 
+
+    cur = cups[cur]
+  }
+
+  return cups
 }
 
 function part1() {
-  const input = parsedInput()
+  const cups = play(9, 100)
 
-  let newinput = [...input]
-  let idx = 0
-
-  for(let i = 0 ; i < 100 ; i++) {
-    newinput = iterate(newinput)
-    //console.log(newinput.join(' '))
+  let cup = cups[1]
+  let txt = ''
+  while (cup != 1) {
+    txt += cup.toString()
+    cup = cups[cup]
   }
+  return txt
+}
 
-  while (newinput[0] !== 1)
-    newinput.push(newinput.shift()!)
+function part2() {
+  const cups = play(1000000, 10000000)
 
-  return newinput.slice(1).join('')
+  const first = cups[1]
+  const second = cups[first]
+
+  return first * second
 }
 
 console.log(part1())
+console.log(part2())

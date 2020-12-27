@@ -26,7 +26,8 @@
     "21": "node dist/aoc21.js",
     "22": "node dist/aoc22.js",
     "23": "node dist/aoc23.js",
-    "24": "node dist/aoc24.js"
+    "24": "node dist/aoc24.js",
+    "25": "node dist/aoc25.js"
   },
   "license": "MIT",
   "devDependencies": {
